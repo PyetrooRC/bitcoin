@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disparos</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#fff; --border:#e5e7eb; --text:#17181b;
+  --muted:#6b7280; --accent:#16a34a; --accent-soft:#ecfdf3;
+  --danger:#dc2626; --danger-soft:#fef2f2; --shadow:0 12px 35px rgba(15,23,42,.07);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.container{width:min(1040px,calc(100% - 32px));margin:auto}
+header{height:64px;background:rgba(255,255,255,.86);border-bottom:1px solid var(--border);display:flex;align-items:center;backdrop-filter:blur(12px)}
+.brand{font-weight:700;letter-spacing:-.3px}
+main{padding:54px 0 70px}
+.hero{margin-bottom:30px}
+.kicker{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+h1{font-size:34px;line-height:1.1;letter-spacing:-1.2px;margin:0 0 10px}
+.hero p{color:var(--muted);font-size:15px;line-height:1.6;margin:0;max-width:650px}
+.action{width:100%;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:22px;text-align:left;cursor:pointer;color:var(--text);box-shadow:var(--shadow);transition:.18s}
+.action:hover{border-color:#cbd5e1;transform:translateY(-1px)}
+.action-top{display:flex;align-items:center;gap:14px}
+.icon{width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:800}
+.action h2{font-size:16px;margin:0 0 4px}
+.action p{color:var(--muted);font-size:13px;line-height:1.45;margin:0}
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.38);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
+.modal-backdrop.open{display:flex}
+.modal{width:min(900px,100%);max-height:94vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 30px 80px rgba(15,23,42,.18)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:19px 22px;border-bottom:1px solid var(--border)}
+.modal-head h2{margin:0;font-size:17px}
+.close{background:transparent;border:0;color:#6b7280;font-size:25px;line-height:1;cursor:pointer}
+.modal-body{padding:22px}
+.upload{display:block;border:1px dashed #cbd5e1;border-radius:14px;padding:28px;text-align:center;background:#fafafa;cursor:pointer;transition:.18s}
+.upload:hover,.upload.drag{border-color:var(--accent);background:var(--accent-soft)}
+.upload-icon{font-size:25px;margin-bottom:8px}
+.upload strong{display:block;font-size:14px}
+.upload span{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+input[type=file]{display:none}
+.status{margin-top:10px;color:var(--muted);font-size:12px}
+.preview-wrap{margin-top:22px;display:none}
+.preview-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.preview-title h3{margin:0;font-size:14px}
+.count{font-size:11px;color:var(--muted);background:#f3f4f6;border:1px solid var(--border);padding:5px 8px;border-radius:999px}
+.table-wrap{border:1px solid var(--border);border-radius:12px;overflow:auto;max-height:300px}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #eef0f2;font-size:12px}
+th{background:#fafafa;color:#6b7280;position:sticky;top:0;z-index:1;font-size:10px;text-transform:uppercase;letter-spacing:.6px}
+td{color:#30343b}
+tr:last-child td{border-bottom:0}
+.badge{display:inline-flex;padding:4px 7px;border-radius:6px;background:#f0fdf4;color:#15803d;font-size:10px}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 22px;border-top:1px solid var(--border)}
+.btn{border:1px solid var(--border);background:#fff;color:var(--text);padding:9px 14px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer}
+.btn:hover{background:#f8fafc}
+.btn.primary{background:var(--text);color:#fff;border-color:var(--text)}
+.btn.primary:hover{background:#000}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.progress{display:none;margin-top:22px;border:1px solid var(--border);border-radius:14px;padding:16px;background:#fafafa}
+.progress.open{display:block}
+.progress-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.progress-head strong{font-size:13px}
+.progress-head span{font-size:11px;color:var(--muted)}
+.steps{display:grid;gap:8px}
+.step{display:flex;gap:10px;align-items:flex-start;padding:9px;border-radius:9px}
+.step.active{background:#fff;border:1px solid #e5e7eb}
+.step.done .step-dot{background:var(--accent);color:#fff}
+.step.error .step-dot{background:var(--danger);color:#fff}
+.step-dot{width:22px;height:22px;flex:0 0 22px;border-radius:50%;background:#e5e7eb;color:#6b7280;display:grid;place-items:center;font-size:11px;font-weight:800}
+.step-copy strong{display:block;font-size:12px}
+.step-copy span{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.4}
+.final-status{display:none;margin-top:14px;border-radius:10px;padding:11px 12px;font-size:12px}
+.final-status.success{display:block;background:var(--accent-soft);color:#166534}
+.final-status.error{display:block;background:var(--danger-soft);color:#991b1b}
+.toast{position:fixed;right:18px;bottom:18px;background:#17181b;color:#fff;padding:10px 13px;border-radius:9px;box-shadow:var(--shadow);display:none;font-size:12px;z-index:40}
+@media(max-width:650px){h1{font-size:29px}main{padding-top:38px}.modal-body{padding:16px}.modal-head,.modal-foot{padding:15px 16px}}
+</style>
+</head>
+<body>
+<header><div class="container"><div class="brand">Disparos</div></div></header>
+
+<main class="container">
+  <section class="hero">
+    <div class="kicker">Agenda</div>
+    <h1>Enviar mensagens</h1>
+    <p>Carregue a agenda, revise os destinatários e acompanhe cada etapa até a confirmação final do disparo.</p>
+  </section>
+
+  <button class="action" id="openConfirm">
+    <div class="action-top">
+      <div class="icon">✓</div>
+      <div>
+        <h2>Iniciar disparo</h2>
+        <p>Processar o PDF, revisar a agenda e enviar para o webhook.</p>
+      </div>
+    </div>
+  </button>
+</main>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Iniciar disparo</h2>
+      <button class="close" id="closeModal" aria-label="Fechar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <label class="upload" id="dropzone" for="pdfInput">
+        <div class="upload-icon">↑</div>
+        <strong id="uploadTitle">Anexar PDF da agenda</strong>
+        <span id="uploadSubtitle">Clique ou arraste um arquivo .pdf</span>
+        <input id="pdfInput" type="file" accept="application/pdf,.pdf">
+      </label>
+
+      <div class="status" id="status"></div>
+
+      <div class="preview-wrap" id="previewWrap">
+        <div class="preview-title">
+          <h3>Prévia dos disparos</h3>
+          <span class="count" id="count">0 registros</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Médico</th><th>Paciente</th><th>Telefone</th><th>Horário</th></tr></thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="progress" id="progress">
+        <div class="progress-head">
+          <strong id="progressTitle">Processando</strong>
+          <span id="progressMeta">0 de 6</span>
+        </div>
+        <div class="steps" id="steps"></div>
+        <div class="final-status" id="finalStatus"></div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="cancelBtn">Fechar</button>
+      <button class="btn primary" id="sendBtn" disabled>Disparar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE = "";
+const modal = document.getElementById("modal");
+const openConfirm = document.getElementById("openConfirm");
+const closeModal = document.getElementById("closeModal");
+const cancelBtn = document.getElementById("cancelBtn");
+const pdfInput = document.getElementById("pdfInput");
+const dropzone = document.getElementById("dropzone");
+const statusEl = document.getElementById("status");
+const previewWrap = document.getElementById("previewWrap");
+const previewBody = document.getElementById("previewBody");
+const countEl = document.getElementById("count");
+const sendBtn = document.getElementById("sendBtn");
+const toast = document.getElementById("toast");
+const progress = document.getElementById("progress");
+const progressTitle = document.getElementById("progressTitle");
+const progressMeta = document.getElementById("progressMeta");
+const stepsEl = document.getElementById("steps");
+const finalStatus = document.getElementById("finalStatus");
+
+const STEPS = [
+  ["Validação", "Validando o arquivo e preparando o processamento."],
+  ["Upload", "Enviando o PDF para o servidor."],
+  ["Processamento", "Executando o processamento da agenda."],
+  ["Conferência", "Carregando e conferindo os destinatários."],
+  ["Webhook", "Enviando a agenda para o webhook."],
+  ["Finalização", "Confirmando o resultado do disparo."]
+];
+
+let currentAgenda = [];
+let busy = false;
+
+function showToast(text){
+  toast.textContent = text;
+  toast.style.display = "block";
+  setTimeout(()=>toast.style.display="none", 3000);
+}
+function openModal(){ modal.classList.add("open"); }
+function close(){ if(!busy) modal.classList.remove("open"); }
+openConfirm.onclick = openModal;
+closeModal.onclick = close;
+cancelBtn.onclick = close;
+modal.addEventListener("click", e => { if(e.target === modal) close(); });
+
+function resetProgress(){
+  progress.classList.remove("open");
+  finalStatus.className = "final-status";
+  finalStatus.textContent = "";
+  stepsEl.innerHTML = "";
+}
+function renderSteps(activeIndex=-1, doneThrough=-1, errorIndex=-1){
+  stepsEl.innerHTML = "";
+  STEPS.forEach((step, i)=>{
+    const el = document.createElement("div");
+    el.className = "step" + (i === activeIndex ? " active" : "") + (i <= doneThrough ? " done" : "") + (i === errorIndex ? " error" : "");
+    const dot = document.createElement("div");
+    dot.className = "step-dot";
+    dot.textContent = i <= doneThrough ? "✓" : (i === errorIndex ? "!" : String(i+1));
+    const copy = document.createElement("div");
+    copy.className = "step-copy";
+    copy.innerHTML = `<strong>${escapeHtml(step[0])}</strong><span>${escapeHtml(step[1])}</span>`;
+    el.append(dot, copy);
+    stepsEl.appendChild(el);
+  });
+  const completed = Math.max(0, doneThrough + 1);
+  progressMeta.textContent = `${Math.min(completed, STEPS.length)} de ${STEPS.length}`;
+}
+function setProgress(activeIndex, doneThrough=-1, title="Processando"){
+  progress.classList.add("open");
+  progressTitle.textContent = title;
+  renderSteps(activeIndex, doneThrough);
+}
+function finishProgress(ok, message){
+  progressTitle.textContent = ok ? "Disparo concluído" : "Disparo com erro";
+  progressMeta.textContent = ok ? `${STEPS.length} de ${STEPS.length}` : "interrompido";
+  renderSteps(-1, ok ? STEPS.length - 1 : -1, ok ? -1 : 0);
+  finalStatus.className = `final-status ${ok ? "success" : "error"}`;
+  finalStatus.textContent = message;
+}
+
+["dragenter","dragover"].forEach(ev => dropzone.addEventListener(ev, e => {
+  e.preventDefault(); dropzone.classList.add("drag");
+}));
+["dragleave","drop"].forEach(ev => dropzone.addEventListener(ev, e => {
+  e.preventDefault(); dropzone.classList.remove("drag");
+}));
+dropzone.addEventListener("drop", e => {
+  const file = e.dataTransfer.files[0];
+  if(file) processPDF(file);
+});
+pdfInput.addEventListener("change", () => {
+  if(pdfInput.files[0]) processPDF(pdfInput.files[0]);
+});
+
+async function processPDF(file){
+  resetProgress();
+  setProgress(0, -1, "Validando arquivo");
+  sendBtn.disabled = true;
+  previewWrap.style.display = "none";
+  if(!file.name.toLowerCase().endsWith(".pdf")){
+    statusEl.textContent = "Selecione um arquivo PDF.";
+    finishProgress(false, "Erro: o arquivo precisa ser um PDF.");
+    return;
+  }
+
+  busy = true;
+  sendBtn.textContent = "Processando…";
+  statusEl.textContent = `${file.name}`;
+  setProgress(1, 0, "Enviando PDF");
+
+  const form = new FormData();
+  form.append("arquivo", file);
+
+  try{
+    const response = await fetch(`${API_BASE}/api/processar-agenda`, {method:"POST", body:form});
+    setProgress(2, 1, "Processando agenda");
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.erro || "Falha ao processar a agenda.");
+
+    setProgress(3, 2, "Conferindo destinatários");
+    currentAgenda = normalizeAgenda(data.agenda);
+    renderPreview(currentAgenda);
+    setProgress(3, 3, "Agenda pronta");
+    statusEl.textContent = `${file.name} processado com sucesso. ${currentAgenda.length} registros encontrados.`;
+    sendBtn.disabled = currentAgenda.length === 0;
+    if(!currentAgenda.length) finishProgress(false, "Nenhum destinatário foi encontrado na agenda.");
+  }catch(err){
+    statusEl.textContent = err.message;
+    finishProgress(false, `Erro no processamento: ${err.message}`);
+    showToast("Não foi possível processar o PDF.");
+    sendBtn.disabled = true;
+  }finally{
+    busy = false;
+    sendBtn.textContent = "Disparar";
+  }
+}
+
+function normalizeAgenda(data){
+  const rows = [];
+  if(Array.isArray(data)){
+    for(const item of data) rows.push({
+      medico:item.medico || item.medico_nome || "",
+      paciente:item.paciente || "",
+      telefone:item.telefone || "",
+      hora:item.hora || item.horario || ""
+    });
+  }else if(data && typeof data === "object"){
+    for(const [medico, agenda] of Object.entries(data)){
+      if(!Array.isArray(agenda)) continue;
+      for(const item of agenda) rows.push({
+        medico, paciente:item.paciente || "", telefone:item.telefone || "",
+        hora:item.hora || item.horario || ""
+      });
+    }
+  }
+  return rows;
+}
+function renderPreview(rows){
+  previewBody.innerHTML = "";
+  for(const row of rows){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHtml(row.medico)}</td><td>${escapeHtml(row.paciente)}</td><td>${escapeHtml(formatPhone(row.telefone))}</td><td><span class="badge">${escapeHtml(row.hora)}</span></td>`;
+    previewBody.appendChild(tr);
+  }
+  countEl.textContent = `${rows.length} ${rows.length === 1 ? "registro" : "registros"}`;
+  previewWrap.style.display = rows.length ? "block" : "none";
+}
+function formatPhone(phone){
+  const p = String(phone || "").replace(/\D/g,"");
+  if(p.length === 11) return `(${p.slice(0,2)}) ${p.slice(2,7)}-${p.slice(7)}`;
+  return phone;
+}
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+sendBtn.onclick = async () => {
+  if(!currentAgenda.length || busy) return;
+  busy = true;
+  sendBtn.disabled = true;
+  sendBtn.textContent = "Disparando…";
+  setProgress(4, 3, "Enviando para o webhook");
+  finalStatus.className = "final-status";
+  finalStatus.textContent = "";
+
+  try{
+    const response = await fetch(`${API_BASE}/api/disparar`, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({agenda:currentAgenda})
+    });
+    setProgress(5, 4, "Confirmando resultado");
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.erro || "Webhook recusou o disparo.");
+
+    const webhookStatus = data.status_webhook ? ` HTTP ${data.status_webhook}.` : "";
+    finishProgress(true, `Concluído. A agenda com ${currentAgenda.length} registros foi aceita pelo webhook.${webhookStatus}`);
+    showToast("Disparo concluído.");
+  }catch(err){
+    finishProgress(false, `Erro no disparo: ${err.message}`);
+    showToast(err.message);
+  }finally{
+    busy = false;
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Disparar";
+  }
+};
+</script>
+</body>
+</html>
