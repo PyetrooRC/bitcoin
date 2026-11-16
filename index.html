@@ -1,0 +1,489 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080e19">
+<title>Bitcoin Live</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #080e19;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  min-height: 100vh;
+  padding: 25px 16px;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 45px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.logo {
+  background: #f7931a;
+  color: #111;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+}
+
+.status {
+  color: #35d69a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  animation: pulse 1.5s infinite;
+}
+
+h1 {
+  font-size: 27px;
+  margin-bottom: 9px;
+}
+
+.subtitle {
+  color: #8795a9;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.input-card {
+  background: #111e30;
+  border: 1px solid #263750;
+  padding: 23px;
+  border-radius: 20px;
+  margin-bottom: 17px;
+}
+
+.label {
+  color: #94a5bb;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  margin-bottom: 15px;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-wrap span {
+  color: #f7931a;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+input {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+input::placeholder {
+  color: #53647b;
+}
+
+.hint {
+  color: #71829a;
+  font-size: 12px;
+  margin-top: 13px;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.result-card {
+  background: #111e30;
+  border: 1px solid #263750;
+  border-radius: 18px;
+  padding: 20px 15px;
+  min-width: 0;
+}
+
+.result-label {
+  color: #91a2b8;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 17px;
+  letter-spacing: .7px;
+}
+
+.result-value {
+  font-size: clamp(19px, 5vw, 25px);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  margin-bottom: 9px;
+  transition: color .3s ease;
+}
+
+.currency {
+  color: #35d69a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rate-card {
+  margin-top: 17px;
+  background: #111e30;
+  border: 1px solid #263750;
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.rate-title {
+  color: #91a2b8;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.rate {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.rate span {
+  color: #f7931a;
+}
+
+.update {
+  color: #8191a7;
+  font-size: 11px;
+  margin-top: 16px;
+}
+
+.refresh {
+  width: 100%;
+  margin-top: 18px;
+  padding: 15px;
+  background: #f7931a;
+  border: none;
+  border-radius: 13px;
+  color: #101010;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .2s, opacity .2s;
+}
+
+.refresh:active {
+  transform: scale(.97);
+}
+
+.refresh.loading {
+  opacity: .7;
+  pointer-events: none;
+}
+
+.updated {
+  animation: valueUpdate .65s ease;
+}
+
+@keyframes valueUpdate {
+  0% {
+    transform: scale(1);
+    color: #fff;
+  }
+  35% {
+    transform: scale(1.07);
+    color: #35d69a;
+  }
+  100% {
+    transform: scale(1);
+    color: #fff;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+.error {
+  color: #ff7979;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+footer {
+  text-align: center;
+  color: #607087;
+  font-size: 11px;
+  margin-top: 35px;
+  line-height: 1.7;
+}
+
+@media (max-width: 350px) {
+  .results {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <div class="brand">
+    <div class="logo">₿</div>
+    BITCOIN LIVE
+  </div>
+
+  <div class="status">● AO VIVO</div>
+</header>
+
+<h1>Seu Bitcoin.</h1>
+
+<p class="subtitle">
+  Acompanhe o valor do seu patrimônio em tempo real.
+</p>
+
+<div class="input-card">
+
+  <div class="label">
+    QUANTO BTC VOCÊ POSSUI?
+  </div>
+
+  <div class="input-wrap">
+    <span>₿</span>
+
+    <input
+      type="number"
+      id="btc"
+      placeholder="0.00000000"
+      min="0"
+      step="any"
+      inputmode="decimal"
+    >
+  </div>
+
+  <p class="hint">
+    Digite sua quantidade de Bitcoin.
+  </p>
+
+</div>
+
+<div class="results">
+
+  <div class="result-card">
+    <div class="result-label">VALOR EM REAIS</div>
+    <div class="result-value" id="brl">R$ 0,00</div>
+    <div class="currency">BRL</div>
+  </div>
+
+  <div class="result-card">
+    <div class="result-label">VALOR EM DÓLARES</div>
+    <div class="result-value" id="usd">US$ 0,00</div>
+    <div class="currency">USD</div>
+  </div>
+
+</div>
+
+<div class="rate-card">
+
+  <div class="rate-title">
+    COTAÇÃO ATUAL DO BITCOIN
+  </div>
+
+  <div class="rate">
+    🇧🇷 <span id="rateBRL">Carregando...</span>
+  </div>
+
+  <div class="rate">
+    🇺🇸 <span id="rateUSD">Carregando...</span>
+  </div>
+
+  <div class="update" id="updated">
+    Consultando mercado...
+  </div>
+
+  <div class="error" id="error"></div>
+
+</div>
+
+<button class="refresh" onclick="getPrices()">
+  ↻ ATUALIZAR AGORA
+</button>
+
+<footer>
+  BITCOIN LIVE · Seu patrimônio em um só lugar<br>
+  Cotações via CoinGecko.<br>
+  Valores informativos, sujeitos a variações.
+</footer>
+
+</div>
+
+<script>
+let priceBRL = 0;
+let priceUSD = 0;
+let updating = false;
+
+const btcInput = document.getElementById("btc");
+
+const formatBRL = value =>
+  value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+
+const formatUSD = value =>
+  value.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD"
+  });
+
+function animateValue(element, value) {
+  if (element.textContent === value) return;
+
+  element.classList.remove("updated");
+
+  void element.offsetWidth;
+
+  element.textContent = value;
+  element.classList.add("updated");
+}
+
+function calculate() {
+  const amount = Math.max(
+    0,
+    Number(btcInput.value) || 0
+  );
+
+  animateValue(
+    document.getElementById("brl"),
+    formatBRL(amount * priceBRL)
+  );
+
+  animateValue(
+    document.getElementById("usd"),
+    formatUSD(amount * priceUSD)
+  );
+}
+
+btcInput.addEventListener("input", calculate);
+
+async function getPrices() {
+
+  if (updating) return;
+
+  updating = true;
+
+  const error = document.getElementById("error");
+  const updated = document.getElementById("updated");
+  const button = document.querySelector(".refresh");
+
+  button.classList.add("loading");
+  button.textContent = "↻ ATUALIZANDO...";
+  error.textContent = "";
+
+  try {
+
+    const response = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl,usd",
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      throw new Error("Cotação indisponível");
+    }
+
+    const data = await response.json();
+
+    const newBRL = data.bitcoin.brl;
+    const newUSD = data.bitcoin.usd;
+
+    if (
+      !Number.isFinite(newBRL) ||
+      !Number.isFinite(newUSD) ||
+      newBRL <= 0 ||
+      newUSD <= 0
+    ) {
+      throw new Error("Dados inválidos");
+    }
+
+    priceBRL = newBRL;
+    priceUSD = newUSD;
+
+    animateValue(
+      document.getElementById("rateBRL"),
+      formatBRL(priceBRL)
+    );
+
+    animateValue(
+      document.getElementById("rateUSD"),
+      formatUSD(priceUSD)
+    );
+
+    calculate();
+
+    updated.textContent =
+      "● Atualizado às " +
+      new Date().toLocaleTimeString("pt-BR");
+
+  } catch (e) {
+
+    error.textContent =
+      "Não foi possível atualizar. Verifique sua internet.";
+
+    updated.textContent =
+      "Aguardando próxima atualização...";
+
+  } finally {
+
+    updating = false;
+
+    button.classList.remove("loading");
+    button.textContent = "↻ ATUALIZAR AGORA";
+
+  }
+}
+
+// Consulta inicial
+getPrices();
+
+// Atualização automática a cada 15 segundos
+setInterval(getPrices, 15000);
+
+</script>
+
+</body>
+</html>
